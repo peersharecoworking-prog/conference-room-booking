@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero"><div class="eyebrow">SELF-SERVICE BOOKING</div><h1>Book your meeting<br><span>in a few clicks.</span></h1><p>Choose a date, pick an available time and you're confirmed. No calls needed.</p></section>
+<section class="panel"><div class="panelhead"><div><div class="eyebrow">YOUR SPACE</div><h2>{{room_name}}</h2><p class="sub">Up to {{capacity}} people · {{open_time}}–{{close_time}}</p></div><span class="available-pill">● Online booking</span></div>
+<a class="whatsapp-share" id="whatsappShare" href="#" target="_blank" rel="noopener">Share booking page on WhatsApp ↗</a>
+<form method="post" action="/book" id="bookingForm">
+<div class="field"><label for="date">1. Choose a date</label><input id="date" name="date" type="date" min="{{today}}" value="{{today}}" required></div>
+<div class="field"><label>2. Choose a start time</label><div id="slots" class="slots"><span class="sub">Select a date to see available times.</span></div><input type="hidden" id="start_time" name="start_time" required></div>
+<div class="field"><label for="duration">How long do you need the room?</label><select id="duration" name="duration"><option value="60">1 hour</option><option value="120">2 hours</option><option value="180">3 hours</option><option value="240">4 hours</option></select></div>
+<div class="rule"></div><div class="eyebrow">YOUR DETAILS</div><div class="formgrid">
+<div class="field"><label for="name">Full name *</label><input id="name" name="name" placeholder="Your name" required maxlength="100"></div>
+<div class="field"><label for="company">Company (optional)</label><input id="company" name="company" placeholder="Company name" maxlength="100"></div>
+<div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" placeholder="you@company.com" required></div>
+<div class="field"><label for="phone">Mobile number *</label><input id="phone" name="phone" type="tel" placeholder="Your phone number" required maxlength="20"></div>
+<div class="field"><label for="attendees">Number of attendees *</label><input id="attendees" name="attendees" type="number" min="1" max="{{capacity}}" value="2" required></div>
+<div class="field"><label for="purpose">Meeting purpose (optional)</label><input id="purpose" name="purpose" placeholder="e.g. Client discussion"></div></div>
+<button class="primary" type="submit">Confirm booking <span>→</span></button><p class="fine">Your booking is confirmed once you submit the form. Please check your details before confirming.</p>
+</form></section>
+<script>
+const shareLink=document.getElementById('whatsappShare');
+const shareText=encodeURIComponent('Book our conference room online: '+window.location.origin);
+shareLink.href='https://wa.me/?text='+shareText;
+const dateInput=document.getElementById('date'), duration=document.getElementById('duration'), slots=document.getElementById('slots'), hidden=document.getElementById('start_time');
+let busy=[],open='09:00',close='18:00',step=60;
+function mins(t){const [h,m]=t.split(':').map(Number);return h*60+m}
+function fmt(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+async function loadSlots(){hidden.value='';slots.innerHTML='<span class="sub">Checking availability…</span>';
+ const res=await fetch('/availability?date='+encodeURIComponent(dateInput.value));if(!res.ok){slots.textContent='Could not load availability.';return}
+ const data=await res.json();busy=data.busy;open=data.open;close=data.close;step=data.slot_minutes;
+ slots.innerHTML='';let found=0,need=Number(duration.value);
+ for(let t=mins(open);t+need<=mins(close);t+=step){let end=t+need,blocked=busy.some(b=>t<mins(b.end)&&end>mins(b.start));
+ const b=document.createElement('button');b.type='button';b.className='slot'+(blocked?' disabled':'');b.textContent=fmt(t);b.disabled=blocked;
+ b.addEventListener('click',()=>{document.querySelectorAll('.slot').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');hidden.value=fmt(t)});
+ slots.appendChild(b);if(!blocked)found++;}
+ if(!found)slots.innerHTML='<span class="sub">No available slots for this duration. Try another date or duration.</span>';
+}
+dateInput.addEventListener('change',loadSlots);duration.addEventListener('change',loadSlots);loadSlots();
+document.getElementById('bookingForm').addEventListener('submit',e=>{if(!hidden.value){e.preventDefault();alert('Please select an available start time.')}});
+</script>{% endblock %}

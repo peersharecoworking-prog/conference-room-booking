@@ -1,0 +1,40 @@
+PUBLISH ONLINE AND SHARE ON WHATSAPP
+
+This package is prepared for Render hosting. It includes a persistent disk for the
+SQLite booking database, a secure generated app secret, and a WhatsApp share link
+on the client booking page.
+
+WHAT YOU NEED
+- A GitHub account
+- A Render account
+- A computer to upload this project to GitHub
+
+STEPS
+1. Create/sign in to GitHub.
+2. Create a new private repository, for example: coworking-conference-booking.
+3. Upload the CONTENTS of this extracted folder to that repository (not the ZIP file).
+4. Sign in to Render and choose New > Blueprint.
+5. Connect GitHub and select your repository.
+6. Render reads render.yaml and proposes the web service and persistent disk.
+7. Enter a strong ADMIN_PASSWORD when Render asks for it. Use at least 10 characters.
+8. Review the service plan and disk cost shown by Render, then approve deployment.
+9. Wait for deployment to finish. Render will give you a public URL similar to
+   https://your-service-name.onrender.com
+10. Open that URL on your phone and test a sample booking.
+11. Open https://your-service-name.onrender.com/admin/login and sign in with
+    the ADMIN_PASSWORD you set.
+12. Send the public booking URL to clients on WhatsApp. The client page also has
+    a "Share booking page on WhatsApp" link.
+
+IMPORTANT
+- The public URL is the CLIENT link. Do not share /admin/login with customers.
+- The database is stored on Render's persistent disk at /var/data/bookings.db.
+- Do not delete the disk or service if you need to keep booking records.
+- Check the actual plan and persistent-disk charges displayed by Render before
+  approving. This configuration uses a paid service plan because the app needs
+  an always-on service and persistent storage.
+- Keep ADMIN_PASSWORD private. Use HTTPS (Render provides it for its public URL).
+- Test bookings, cancellations, opening hours and time blocks before sharing widely.
+- This does not automatically send a WhatsApp message after each booking; it creates
+  a WhatsApp share action so you can distribute the booking-page link. Automated
+  WhatsApp notifications require a WhatsApp Business Platform integration.
