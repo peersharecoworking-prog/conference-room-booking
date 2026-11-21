@@ -2,6 +2,8 @@
 
 A lightweight Flask + SQLite booking app for one coworking-space conference room.
 
+more at www.teckum.com
+
 ## Run locally
 1. Install Python 3.10+.
 2. Open a terminal in this folder.
